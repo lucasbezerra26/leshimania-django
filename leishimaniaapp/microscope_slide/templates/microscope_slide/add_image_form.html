@@ -1,0 +1,74 @@
+{% extends "microscope_slide/base.html" %}
+
+{% block title %}Adicionar Imagem da Lâmina{% endblock %}
+
+{% block page %}
+  <li class="breadcrumb-item"><a href="{% url 'dataset' %}">Dataset</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'list_microscope_image' slide.id %}">{{ slide.slide_name }}</a></li>
+  <li class="breadcrumb-item active">Adicionar Imagem</li>
+{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="row">
+    <div class="col-lg-12">
+    <div class="card mt-5">
+        <div class="card-body">
+          <h5 class="card-title">Adicionar Imagem à Lâmina: {{ slide.slide_name }}</h5>
+          <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="text-center">
+              <a class="btn btn-secondary" href="{% url 'list_microscope_image' slide.id %}">Voltar</a>
+              <button type="submit" class="btn btn-primary">Adicionar Imagem</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- Carrossel -->
+{#      <div id="carouselExampleControls" class="card carousel slide w-100" data-bs-ride="carousel">#}
+{#        <div class="carousel-inner ">#}
+{#          {% for image in images %}#}
+{#            <div class=" carousel-item {% if forloop.first %}active{% endif %}">#}
+{#              <img src="{{ image.image.url }}" class="p-5" alt="{{ image.image.name }}">#}
+{#            </div>#}
+{#          {% endfor %}#}
+{#        </div>#}
+{#        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">#}
+{#          <span class="carousel-control-prev-icon" aria-hidden="true"></span>#}
+{#          <span class="visually-hidden">Previous</span>#}
+{#        </button>#}
+{#        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">#}
+{#          <span class="carousel-control-next-icon" aria-hidden="true"></span>#}
+{#          <span class="visually-hidden">Next</span>#}
+{#        </button>#}
+{#      </div>#}
+
+
+
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block javascript %}
+<script>
+  document.getElementById('adiciona_imagem').addEventListener('change', function(event) {
+    var files = event.target.files;
+    var carouselInner = document.querySelector('.carousel-inner');
+
+    carouselInner.innerHTML = '';
+
+    Array.from(files).forEach((file, index) => {
+      var fileURL = URL.createObjectURL(file);
+      var isActive = index === 0 ? 'active' : '';
+
+      carouselInner.innerHTML += `
+        <div class="carousel-item ${isActive}">
+          <img src="${fileURL}" class="d-block w-100">
+        </div>
+      `;
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "microscope_slide/base.html" %}
+{% load static %}
+
+{% block title %}Dataset de Imagens{% endblock %}
+
+{% block page %}
+  <li class="breadcrumb-item"><a href="{% url 'add_microscope_slide' %}">Lâminas</a></li>
+  <li class="breadcrumb-item active">{{ slide_name }}</li>
+{% endblock %}
+
+{% block content %}
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Dataset de Imagens de LV Humana</h5>
+
+            <!-- Tabela com linhas -->
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th scope="col">Imagem</th>
+                  <th scope="col">Classe</th>
+                  <th scope="col">Porcentagem</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if images %}
+                  {% for image in images %}
+                    <tr>
+                      <td>
+                        <a href="{{ image.image.url }}">{{ image.image }}</a>
+                      </td>
+                      <td>
+                        {% if image.prediction_class %}
+                          {{ image.prediction_class }}
+                        {% else %}
+                          -
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if image.prediction_percentage %}
+                          {{ image.prediction_percentage }}%
+                        {% else %}
+                          -
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="3">Nenhuma imagem encontrada.</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+
+            <div class="text-center">
+              <button id="button-show-modal" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newImageModal">Adicionar Imagem</button>
+              <a class="btn btn-secondary" href="{% url 'add_microscope_slide' %}">Voltar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal -->
+  <div class="modal fade" id="newImageModal" tabindex="-1" aria-labelledby="newImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="newImageModalLabel">Adicionar Imagem à Lâmina: {{ slide_name }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="new-image-form" method="post" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+              <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block javascript %}
+  <script>
+    {% if form.errors %}
+      document.getElementById('button-show-modal').click();
+    {% endif %}
+  </script>
+{% endblock %}

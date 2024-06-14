@@ -1,0 +1,99 @@
+{% extends "microscope_slide/base.html" %}
+{% load static %}
+
+{% block title %}Dataset de Imagens{% endblock %}
+
+{% block page %}
+  <li class="breadcrumb-item"><a href="{% url 'dataset' %}">Dataset</a></li>
+  <li class="breadcrumb-item active">{{ slide_name }}</li>
+{% endblock %}
+
+{% block content %}
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Dataset de Imagens de LV Humana</h5>
+
+            <table class="table table-striped">
+              <thead>
+              <tr>
+                <th scope="col">Lâmina</th>
+                <th scope="col">Classe</th>
+                <th scope="col">Porcentagem</th>
+              </tr>
+              </thead>
+              <tbody>
+              {% if slides %}
+                {% for slide in slides %}
+                  <tr>
+                  <td>
+                      <a href="{% url 'list_microscope_image' slide.id %}">{{ slide.slide_name }}</a>
+                  </td>
+                  <td>
+                    {% if slide.prediction_class %}
+                      {{ slide.prediction_class }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if slide.prediction_percentage %}
+                      {{ slide.prediction_percentage }}%
+                    {% else %}
+                      -
+                    {% endif %}
+
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="3">Nenhuma lâmina encontrada.</td>
+                </tr>
+              {% endif %}
+              </tbody>
+            </table>
+
+            <div class="text-center">
+              <button id="button-show-modal" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newSlideModal">Nova Lâmina</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal -->
+  <div class="modal fade" id="newSlideModal" tabindex="-1" aria-labelledby="newSlideModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="newSlideModalLabel">Adicionar Nova Lâmina</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="new-slide-form" method="post" action="{% url 'add_microscope_slide' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+              <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% block javascript %}
+    <script>
+    {% if form.errors %}
+      document.getElementById('button-show-modal').click();
+    {% endif %}
+
+
+    </script>
+  {% endblock %}
+
+{% endblock %}
