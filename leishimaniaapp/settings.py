@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-%ch2)qd63q4c!syhlq329whezk&%nz1m$sm9m9+t&z#h+%as8s"
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "dal",
     "dal_select2",
     "rest_framework",
+    "debug_toolbar",
     # Local apps
     "leishimaniaapp.core",
     "leishimaniaapp.microscope_slide",
@@ -63,14 +64,16 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "leishimaniaapp.urls"
 
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -108,6 +111,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# celery
+
+CELERY_TASK_SERIALIZER = "json"
+CELERY_BROKER_URL = config(
+    "CELERY_BROKER_URL", default="amqp://guest:guest@rabbit:5672"
+)
+CELERY_DEFAULT_EXCHANGE = config(
+    "CELERY_DEFAULT_EXCHANGE", default="leishimaniaapp-prod"
+)
+CELERY_DEFAULT_QUEUE = config("CELERY_DEFAULT_QUEUE", default="leishimaniaapp-prod")
 
 # Internationalization
 LANGUAGE_CODE = "pt-br"
@@ -133,3 +146,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.User"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/login/"
+LOGIN_URL = "/login/"
+
+
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]

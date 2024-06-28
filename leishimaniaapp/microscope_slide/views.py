@@ -1,5 +1,6 @@
 import pickle
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import View
@@ -17,7 +18,7 @@ import os
 import numpy as np
 
 
-class MicroscopeSlideView(View):
+class MicroscopeSlideView(LoginRequiredMixin, View):
 
     def get(self, request):
         form = MicroscopeSlideFormModal(user_filter=request.user)
@@ -38,7 +39,7 @@ class MicroscopeSlideView(View):
         return render(request, "microscope_slide/microscope_slide.html", {"form": form})
 
 
-class ListMicroscopeImageView(FormView):
+class ListMicroscopeImageView(LoginRequiredMixin, FormView):
     template_name = "microscope_slide/microscope_images.html"
     form_class = MicroscopeImageForm
 
@@ -110,7 +111,7 @@ class ListMicroscopeImageView(FormView):
         )
 
 
-class SlideClassificationView(View):
+class SlideClassificationView(LoginRequiredMixin, View):
     def get(self, request, slide_id):
         slide = MicroscopeSlide.objects.get(id=slide_id)
         images = slide.images.all()
@@ -119,6 +120,17 @@ class SlideClassificationView(View):
         )
 
 
-class HomeView(View):
+class CaptureImageView(LoginRequiredMixin, TemplateView):
+    template_name = "microscope_slide/capture_image.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        slide_id = self.kwargs["slide_id"]
+        context["slide_name"] = MicroscopeSlide.objects.get(id=slide_id).slide_name
+        context["slide_id"] = slide_id
+        return context
+
+
+class HomeView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, "microscope_slide/home.html")

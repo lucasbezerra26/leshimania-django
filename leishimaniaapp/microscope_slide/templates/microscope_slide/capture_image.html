@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block page %}
+  <li class="breadcrumb-item"><a href="{% url 'add_microscope_slide' %}">Lâminas</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'list_microscope_image' slide_id %}">{{ slide.slide_name }}</a></li>
+  <li class="breadcrumb-item active">Adicionar Imagem</li>
+{% endblock %}
+
+{% block css %}
+  <style>
+      .data-console {
+          width: 100%;
+          min-height: 130px;
+          overflow-y: scroll;
+          border: 1px solid #ccc;
+      }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title text-center">Classificação de Imagens de LV Humana</h5>
+
+            <div class="row justify-content-center">
+              <div class="col-lg-6">
+                <div class="contentarea">
+                  <div class="camera h-100 w-100">
+                    <video id="video" class="h-100 w-100">Video não disponível.</video>
+                    <button id="startbutton" class="d-none">Take photo</button>
+                  </div>
+                  <canvas id="canvas" class="h-100 w-100 d-none"></canvas>
+                  <div class="text-center mt-3 pre-capture">
+                    <label for="cameraSelect" class="form-label">Selecionar Câmera</label>
+                    <select id="cameraSelect" class="form-control"></select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-center align-content-center w-100">
+              <textarea id="dataReceived" class="data-console w-50" readonly></textarea>
+            </div>
+            <br><br>
+
+            <div class="text-center">
+              <button class="btn btn-primary pre-capture" id="connect">Iniciar</button>
+              <button class="btn btn-danger capture-started" id="disconnect">Finalizar</button>
+              <a href="{% url 'list_microscope_image' slide_id %}" class="btn btn-secondary">Voltar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block javascript %}
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let video = document.getElementById("video");
+      let canvas = document.getElementById("canvas");
+      let startbutton = document.getElementById("startbutton");
+      let cameraSelect = document.getElementById("cameraSelect");
+
+      const width = 1280;
+      let height = 720;
+      let streaming = false;
+      let currentStream = null;
+      let port, reader;
+
+      async function getCameras() {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        videoDevices.forEach((device, index) => {
+          const option = document.createElement('option');
+          option.value = device.deviceId;
+          option.text = device.label || `Câmera ${index + 1}`;
+          cameraSelect.appendChild(option);
+        });
+
+        if (videoDevices.length > 0) {
+          startCamera({ video: { deviceId: { exact: videoDevices[0].deviceId } } });
+        }
+      }
+
+      async function startCamera(constraints) {
+        if (currentStream) {
+          currentStream.getTracks().forEach(track => track.stop());
+        }
+        try {
+          currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+          video.srcObject = currentStream;
+          video.play();
+        } catch (err) {
+          console.error(`An error occurred: ${err}`);
+        }
+      }
+
+      function setupListeners() {
+        video.addEventListener("canplay", (ev) => {
+          if (!streaming) {
+            height = video.videoHeight / (video.videoWidth / width);
+            if (isNaN(height)) {
+              height = width / (4 / 3);
+            }
+            video.setAttribute("width", width);
+            video.setAttribute("height", height);
+            canvas.setAttribute("width", width);
+            canvas.setAttribute("height", height);
+            streaming = true;
+          }
+        });
+
+        startbutton.addEventListener("click", (ev) => {
+          takePicture();
+          ev.preventDefault();
+        });
+
+        cameraSelect.addEventListener('change', event => {
+          changeCamera(event.target.value);
+        });
+
+        document.querySelector('#connect').addEventListener('click', connectSerialPort);
+        document.querySelector('#disconnect').addEventListener('click', disconnectSerialPort);
+      }
+
+      function clearPhoto() {
+        const context = canvas.getContext("2d");
+        context.fillStyle = "#AAA";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      function takePicture() {
+        const context = canvas.getContext("2d");
+        if (width && height) {
+          canvas.width = width;
+          canvas.height = height;
+          context.drawImage(video, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            const formData = new FormData();
+            formData.append("file", blob, "image.png");
+
+            fetch("predict-send-image", {
+              method: "POST",
+              body: formData,
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                console.log(data);
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+              });
+          }, "image/png");
+        } else {
+          clearPhoto();
+        }
+      }
+
+      async function connectSerialPort() {
+        try {
+          port = await navigator.serial.requestPort();
+          await port.open({ baudRate: 9600 });
+          const textArea = document.querySelector('#dataReceived');
+
+          async function writeSerial(data) {
+            let writer = port.writable.getWriter();
+            await writer.write(data);
+            await writer.releaseLock();
+          }
+
+          async function readSerial() {
+            reader = port.readable.getReader();
+            try {
+              let receivedData = '';
+              while (true) {
+                const { value, done } = await reader.read();
+                if (done) {
+                  break;
+                }
+                const textDecoder = new TextDecoder();
+                const incomingData = textDecoder.decode(value);
+                receivedData += incomingData;
+
+
+
+                let delimiterIndex = receivedData.indexOf('\n');
+                if (delimiterIndex != 2) {
+                  textArea.value += receivedData.substring(0, delimiterIndex);
+                  textArea.scrollTop = textArea.scrollHeight;
+                }
+                while (delimiterIndex != -1) {
+                  const completeMessage = receivedData.substring(0, delimiterIndex);
+                  {#console.log(completeMessage);#}
+                  let data = new TextEncoder().encode('1');
+                  document.getElementById('startbutton').click();
+                  {#textArea.value += "Imagem Capturada\n";#}
+                  {#textArea.scrollTop = textArea.scrollHeight;#}
+                  await writeSerial(data);
+
+                  receivedData = receivedData.substring(delimiterIndex + 1);
+                  delimiterIndex = receivedData.indexOf('\n');
+                }
+              }
+            } catch (error) {
+              console.error(error);
+            } finally {
+              reader.releaseLock();
+            }
+          }
+
+          readSerial();
+
+          document.querySelector('.pre-capture').style.display = 'none';
+          document.querySelector('#connect').style.display = 'none';
+          document.querySelector('.capture-started').style.display = 'inline-block';
+
+        } catch (error) {
+          console.error("Erro ao conectar à porta serial:", error);
+        }
+      }
+
+      async function disconnectSerialPort() {
+        if (reader) {
+          await reader.cancel();
+          await reader.releaseLock();
+        }
+        if (port) {
+          await port.close();
+        }
+
+        document.querySelector('.pre-capture').style.display = 'block';
+        document.querySelector('.capture-started').style.display = 'none';
+      }
+
+      async function changeCamera(deviceId) {
+        try {
+          startCamera({ video: { deviceId: { exact: deviceId } } });
+        } catch (error) {
+          console.error("Erro ao mudar a câmera:", error);
+        }
+      }
+
+      getCameras();
+      setupListeners();
+    });
+  </script>
+{% endblock %}

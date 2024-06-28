@@ -1,4 +1,4 @@
-{% extends "microscope_slide/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Adicionar Imagem da Lâmina{% endblock %}
 
@@ -25,26 +25,6 @@
           </form>
         </div>
       </div>
-      <!-- Carrossel -->
-{#      <div id="carouselExampleControls" class="card carousel slide w-100" data-bs-ride="carousel">#}
-{#        <div class="carousel-inner ">#}
-{#          {% for image in images %}#}
-{#            <div class=" carousel-item {% if forloop.first %}active{% endif %}">#}
-{#              <img src="{{ image.image.url }}" class="p-5" alt="{{ image.image.name }}">#}
-{#            </div>#}
-{#          {% endfor %}#}
-{#        </div>#}
-{#        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">#}
-{#          <span class="carousel-control-prev-icon" aria-hidden="true"></span>#}
-{#          <span class="visually-hidden">Previous</span>#}
-{#        </button>#}
-{#        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">#}
-{#          <span class="carousel-control-next-icon" aria-hidden="true"></span>#}
-{#          <span class="visually-hidden">Next</span>#}
-{#        </button>#}
-{#      </div>#}
-
-
 
     </div>
   </div>
@@ -52,23 +32,5 @@
 {% endblock %}
 
 {% block javascript %}
-<script>
-  document.getElementById('adiciona_imagem').addEventListener('change', function(event) {
-    var files = event.target.files;
-    var carouselInner = document.querySelector('.carousel-inner');
 
-    carouselInner.innerHTML = '';
-
-    Array.from(files).forEach((file, index) => {
-      var fileURL = URL.createObjectURL(file);
-      var isActive = index === 0 ? 'active' : '';
-
-      carouselInner.innerHTML += `
-        <div class="carousel-item ${isActive}">
-          <img src="${fileURL}" class="d-block w-100">
-        </div>
-      `;
-    });
-  });
-</script>
 {% endblock %}

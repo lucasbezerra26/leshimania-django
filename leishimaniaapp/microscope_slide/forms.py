@@ -39,3 +39,17 @@ class MicroscopeImageForm(forms.ModelForm):
         widgets = {
             "image": forms.FileInput(attrs={"class": "form-control"}),
         }
+
+
+# class MicroscopeImageForm(forms.ModelForm):
+#     image = forms.ImageField(widget=forms.ClearableFileInput(attrs={"multiple": True}))
+#
+#     class Meta:
+#         model = MicroscopeImage
+#         fields = ["image"]
+#         labels = {
+#             "image": "Imagem",
+#         }
+#         widgets = {
+#             "image": forms.FileInput(attrs={"class": "form-control"}),
+#         }

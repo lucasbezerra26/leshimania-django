@@ -1,10 +1,10 @@
-{% extends "microscope_slide/base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block title %}Dataset de Imagens{% endblock %}
 
 {% block page %}
-  <li class="breadcrumb-item"><a href="{% url 'dataset' %}">Dataset</a></li>
+  <li class="breadcrumb-item">Lâminas</li>
   <li class="breadcrumb-item active">{{ slide_name }}</li>
 {% endblock %}
 

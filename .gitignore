@@ -113,3 +113,13 @@ __pycache__
 *.bmp
 *.tiff
 *.tif
+
+data
+.idea
+.vscode
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.db
+
