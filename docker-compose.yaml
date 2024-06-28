@@ -31,12 +31,15 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    command: celery -A leishimaniaapp.celery worker --loglevel=INFO --concurrency=2
+    command: celery -A leishimaniaapp worker -l info --concurrency=2
     env_file:
       - .env
     depends_on:
       - rabbit
       - postgres
+    volumes:
+      - static_volume:/code/staticfiles
+      - media_volume:/code/media
 
   web:
     platform: linux/x86_64
