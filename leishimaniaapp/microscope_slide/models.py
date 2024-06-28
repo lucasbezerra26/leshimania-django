@@ -62,6 +62,9 @@ class MicroscopeImage(BaseModelUuid):
     prediction_class = models.CharField(
         "Classe de previsão", max_length=50, null=True, blank=True
     )
+    prediction_percentage = models.FloatField(
+        "Porcentagem de previsão", null=True, blank=True
+    )
 
     def __str__(self):
         return f"{self.microscope_slide.slide_name} - {self.image}"

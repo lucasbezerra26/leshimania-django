@@ -59,7 +59,7 @@
 
             <div class="text-center">
               <a  class="btn btn-warning" href="{% url 'capture_image_auto' slide_id %}">Captura Automática</a>
-              <button id="button-show-modal" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newImageModal">Adicionar Imagem</button>
+              <button id="button-show-modal" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newSlideModal">Adicionar Imagem</button>
               <a class="btn btn-secondary" href="{% url 'add_microscope_slide' %}">Voltar</a>
             </div>
           </div>
@@ -69,17 +69,20 @@
   </section>
 
   <!-- Modal -->
-  <div class="modal fade" id="newImageModal" tabindex="-1" aria-labelledby="newImageModalLabel" aria-hidden="true">
+  <div class="modal fade" id="newSlideModal" tabindex="-1" aria-labelledby="newSlideModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="newImageModalLabel">Adicionar Imagem à Lâmina: {{ slide_name }}</h5>
+          <h5 class="modal-title" id="newSlideModalLabel">Adicionar Nova Lâmina</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="new-image-form" method="post" action="" enctype="multipart/form-data">
+          <form id="new-slide-form" method="post" action="{% url 'list_microscope_image' slide_id %}" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
+            <div class="mb-3">
+              <label for="image" class="form-label">Imagens</label>
+              <input type="file" class="form-control" id="image" name="image" multiple>
+            </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
               <button type="submit" class="btn btn-primary">Salvar</button>

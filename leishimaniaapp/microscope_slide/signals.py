@@ -9,3 +9,6 @@ def update_microscope_slide(sender, instance, **kwargs):
     if instance.prediction_class == "Positivo":
         slide.prediction_class = "Positivo"
         slide.save(update_fields=["prediction_class"])
+    elif instance.prediction_class == "Negativo" and slide.prediction_class is None:
+        slide.prediction_class = "Negativo"
+        slide.save(update_fields=["prediction_class"])

@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "dal_select2",
     "rest_framework",
     "debug_toolbar",
+    "celery",
     # Local apps
     "leishimaniaapp.core",
     "leishimaniaapp.microscope_slide",
@@ -91,7 +92,7 @@ WSGI_APPLICATION = "leishimaniaapp.wsgi.application"
 
 DATABASE_URL = config(
     "DATABASE_URL",
-    default="postgres://leishimaniaapp:leishimaniaapp@localhost:5440/leishimaniaapp",
+    default="postgres://leishimaniaapp:leishimaniaapp@postgres:5432/leishimaniaapp",
 )
 DATABASES = {"default": dj_database_url.parse(DATABASE_URL)}
 
@@ -114,13 +115,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # celery
 
 CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_BROKER_URL = config(
     "CELERY_BROKER_URL", default="amqp://guest:guest@rabbit:5672"
 )
-CELERY_DEFAULT_EXCHANGE = config(
-    "CELERY_DEFAULT_EXCHANGE", default="leishimaniaapp-prod"
-)
-CELERY_DEFAULT_QUEUE = config("CELERY_DEFAULT_QUEUE", default="leishimaniaapp-prod")
+# CELERY_DEFAULT_EXCHANGE = config(
+#     "CELERY_DEFAULT_EXCHANGE", default="leishimaniaapp-prod"
+# )
+# CELERY_DEFAULT_QUEUE = config("CELERY_DEFAULT_QUEUE", default="leishimaniaapp-prod")
+CELERY_TIMEZONE = "America/Sao_Paulo"
 
 # Internationalization
 LANGUAGE_CODE = "pt-br"

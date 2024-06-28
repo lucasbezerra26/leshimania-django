@@ -1,21 +1,12 @@
-import pickle
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import View
-from django.conf import settings
-from django.views.generic import TemplateView, CreateView, FormView
-import joblib
+from django.views.generic import TemplateView, FormView
 
-from .helpers import verify_image_upload
-from .models import MicroscopeSlide, MicroscopeImage, Laboratory
 from .forms import MicroscopeSlideFormModal, MicroscopeImageForm
-from tensorflow.keras.preprocessing.image import img_to_array, load_img
-from tensorflow.keras.models import model_from_json
-from tensorflow.keras.applications.inception_v3 import preprocess_input
-import os
-import numpy as np
+from .models import MicroscopeSlide, MicroscopeImage
+from .tasks import process_image
 
 
 class MicroscopeSlideView(LoginRequiredMixin, View):
@@ -51,59 +42,17 @@ class ListMicroscopeImageView(LoginRequiredMixin, FormView):
         context["slide_id"] = slide_id
         return context
 
-    def form_valid(self, form):
+    def post(self, request, *args, **kwargs):
         slide_id = self.kwargs["slide_id"]
-        form.instance.microscope_slide = get_object_or_404(MicroscopeSlide, id=slide_id)
-        self.object = form.save()
+        microscope_slide = get_object_or_404(MicroscopeSlide, id=slide_id)
+        files = request.FILES.getlist("image")
 
-        # Verificar se a imagem é válida
-        if self.verifica_imagem_upload(self.object.image.path):
-            self.classify_image(self.object)
-            return super().form_valid(form)
-        else:
-            # Se a imagem não for válida, redirecionar para a mesma página com uma mensagem de erro
-            form.add_error(None, "A imagem carregada não é válida.")
-            self.object.delete()
-            return self.form_invalid(form)
+        for file in files:
+            slide_image = MicroscopeImage(microscope_slide=microscope_slide, image=file)
+            slide_image.save()
+            process_image.delay(slide_image.id)
 
-    def classify_image(self, slide_image):
-        model = self.load_model()
-        img = load_img(slide_image.image.path, target_size=(299, 299))
-        img = img_to_array(img)
-        img = np.expand_dims(img, axis=0)
-        img = preprocess_input(img)
-        prediction = model.predict(img)
-        temp = prediction
-        prediction = (prediction > 0.5).astype(np.uint8)
-        if prediction[0] == 1:
-            slide_image.prediction_class = "Positivo"
-            slide_image.prediction_percentage = round(temp[0][0] * 100, 2)
-        else:
-            slide_image.prediction_class = "Negativo"
-            slide_image.prediction_percentage = round((1 - temp[0][0]) * 100, 2)
-        slide_image.save()
-
-    def load_model(self):
-        json_path = os.path.join(
-            settings.BASE_DIR, "models-classification/inception_v3.json"
-        )
-        model_path = os.path.join(
-            settings.BASE_DIR, "models-classification/inception_v3.h5"
-        )
-        with open(json_path, "r") as json_file:
-            saved_model_json = json_file.read()
-        model = model_from_json(saved_model_json)
-        model.load_weights(model_path)
-        return model
-
-    def verifica_imagem_upload(self, image_path):
-        return True
-        model_path = os.path.join(
-            settings.BASE_DIR, "models-classification/random_forest_model.joblib"
-        )
-
-        loaded_model = joblib.load(model_path)
-        return verify_image_upload(image_path, loaded_model)
+        return redirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse(

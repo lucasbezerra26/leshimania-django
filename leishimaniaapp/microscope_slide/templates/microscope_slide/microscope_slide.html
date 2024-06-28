@@ -22,7 +22,6 @@
               <tr>
                 <th scope="col">Lâmina</th>
                 <th scope="col">Classe</th>
-                <th scope="col">Porcentagem</th>
               </tr>
               </thead>
               <tbody>
@@ -39,14 +38,6 @@
                       -
                     {% endif %}
                   </td>
-                  <td>
-                    {% if slide.prediction_percentage %}
-                      {{ slide.prediction_percentage }}%
-                    {% else %}
-                      -
-                    {% endif %}
-
-                  </tr>
                 {% endfor %}
               {% else %}
                 <tr>
