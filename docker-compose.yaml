@@ -15,7 +15,7 @@ services:
       - 5440:5432
 
   rabbit:
-    image: "rabbitmq:3.8-management-alpine"
+    image: "rabbitmq:management-alpine"
     ports:
       - 5672:5672
       - 15672:15672
@@ -27,7 +27,6 @@ services:
       - ./data/rabbitmq/log/:/var/log/rabbitmq
 
   worker:
-    platform: linux/x86_64
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -42,7 +41,6 @@ services:
       - ./media:/code/media
 
   web:
-    platform: linux/x86_64
     restart: always
     build:
       context: .

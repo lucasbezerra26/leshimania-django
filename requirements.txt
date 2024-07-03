@@ -20,14 +20,13 @@ django-debug-toolbar==4.4.2
 djangorestframework==3.15.1
 flatbuffers==24.3.25
 gast==0.5.4
-gevent==24.2.1
 google-auth==2.29.0
 google-auth-oauthlib==1.2.0
 google-pasta==0.2.0
 greenlet==3.0.3
 grpcio==1.63.0
 gunicorn==22.0.0
-h5py==3.11.0
+#h5py==3.11.0
 idna==3.7
 imageio==2.34.1
 importlib_metadata==7.1.0
@@ -55,7 +54,6 @@ pillow==10.3.0
 platformdirs==4.2.1
 prompt_toolkit==3.0.47
 protobuf==4.23.4
-psycogreen==1.0.2
 psycopg2-binary==2.9.9
 pyasn1==0.6.0
 pyasn1_modules==0.4.0
