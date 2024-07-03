@@ -90,7 +90,6 @@ db.sqlite3
 
 .idea
 
-static/imagens/
 static/.DS_Store
 venv
 .idea
@@ -102,17 +101,6 @@ __pycache__
 *.sqlite3
 .env
 
-#igone imgs
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.svg
-*.ico
-*.webp
-*.bmp
-*.tiff
-*.tif
 
 data
 .idea
@@ -123,3 +111,4 @@ __pycache__
 *.pyd
 *.db
 
+media
