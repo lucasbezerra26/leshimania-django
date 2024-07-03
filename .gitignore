@@ -112,3 +112,5 @@ __pycache__
 *.db
 
 media
+.python-version
+staticfiles
