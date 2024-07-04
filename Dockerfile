@@ -6,9 +6,15 @@ ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
-    libglib2.0-0
+    libglib2.0-0 \
+    curl
+
 # Set work directory
 WORKDIR /code
+
+# Download wait-for-it script
+RUN curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh \
+    && chmod +x /usr/local/bin/wait-for-it
 
 # Install Python dependencies
 COPY requirements.txt /code/
