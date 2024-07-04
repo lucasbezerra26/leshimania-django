@@ -34,7 +34,12 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = ["*"]
 
-ALLOWED_HOSTS = ["leishiapp.software", "www.leishiapp.software", "localhost"]
+ALLOWED_HOSTS = [
+    "leishiapp.software",
+    "www.leishiapp.software",
+    "localhost",
+    "127.0.0.1",
+]
 CSRF_TRUSTED_ORIGINS = [
     "https://leishiapp.software",
     "https://www.leishiapp.software",
@@ -123,11 +128,9 @@ AUTH_PASSWORD_VALIDATORS = [
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_ACCEPT_CONTENT = ["application/json"]
-CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="amqp://guest:guest@rabbit:5672//")
-# CELERY_DEFAULT_EXCHANGE = config(
-#     "CELERY_DEFAULT_EXCHANGE", default="leishimaniaapp-prod"
-# )
-# CELERY_DEFAULT_QUEUE = config("CELERY_DEFAULT_QUEUE", default="leishimaniaapp-prod")
+CELERY_BROKER_URL = config(
+    "CELERY_BROKER_URL", default="amqp://guest:guest@localhost:5672//"
+)
 CELERY_TIMEZONE = "America/Sao_Paulo"
 
 # Internationalization
