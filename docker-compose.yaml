@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   postgres:
+    restart: always
     image: postgres:13-alpine
     container_name: leishimaniaapp-db
     environment:
@@ -15,6 +16,7 @@ services:
       - 5440:5432
 
   rabbit:
+    restart: always
     image: rabbitmq:alpine
     ports:
       - 5672:5672
@@ -24,9 +26,14 @@ services:
     volumes:
       - ./data/rabbitmq/data/:/var/lib/rabbitmq/
       - ./data/rabbitmq/log/:/var/log/rabbitmq
-      - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
 
   worker:
+    restart: always
     platform: linux/x86_64
     build:
       context: .
@@ -54,11 +61,13 @@ services:
     depends_on:
       - postgres
       - rabbit
-    entrypoint: sh -c "wait-for-it rabbit:5672 -- /code/scripts_infra/entrypoint.sh"
+    entrypoint: sh -c "wait-for-it rabbit:5672 -- /code/entrypoint.sh"
     volumes:
       - ./staticfiles:/code/staticfiles
       - ./media:/code/media
+
   nginx:
+    restart: always
     image: nginx:alpine
     ports:
       - 80:80
