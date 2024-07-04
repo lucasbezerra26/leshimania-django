@@ -11,7 +11,7 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data/pgdata
     ports:
-      - 5440:5432
+      - 5432:5432
 
   rabbit:
     restart: always
@@ -39,6 +39,7 @@ services:
       context: .
       dockerfile: ./Dockerfile
     command: sh -c "wait-for-it rabbit:5672 -- celery -A leishimaniaapp worker -l info --concurrency=1"
+    network_mode: host
     env_file:
       - .env
     depends_on:
@@ -51,6 +52,7 @@ services:
   web:
     platform: linux/x86_64
     restart: always
+    network_mode: host
     build:
       context: .
       dockerfile: ./Dockerfile
