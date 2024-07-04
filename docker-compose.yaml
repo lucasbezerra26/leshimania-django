@@ -61,7 +61,7 @@ services:
     depends_on:
       - postgres
       - rabbit
-    entrypoint: sh -c "wait-for-it rabbit:5672 -- /code/entrypoint.sh"
+    entrypoint: sh -c "wait-for-it rabbit:5672 -- /code/scripts_infra/entrypoint.sh"
     volumes:
       - ./staticfiles:/code/staticfiles
       - ./media:/code/media
