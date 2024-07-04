@@ -123,7 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_ACCEPT_CONTENT = ["application/json"]
-CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="amqp://admin:admin@rabbit")
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="amqp://guest:guest@rabbit:5672//")
 # CELERY_DEFAULT_EXCHANGE = config(
 #     "CELERY_DEFAULT_EXCHANGE", default="leishimaniaapp-prod"
 # )
