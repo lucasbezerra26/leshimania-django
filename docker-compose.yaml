@@ -9,6 +9,8 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - ./data/postgres:/var/lib/postgresql/data/pgdata
+    ports:
+      - 5432:5432
 
   rabbit:
     restart: always
@@ -19,6 +21,9 @@ services:
     volumes:
       - ./data/rabbitmq/data/:/var/lib/rabbitmq/
       - ./data/rabbitmq/log/:/var/log/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 30s
@@ -55,6 +60,8 @@ services:
     depends_on:
       - postgres
       - rabbit
+    ports:
+      - 8080:8080
     entrypoint: /code/scripts_infra/entrypoint.sh
     volumes:
       - ./staticfiles:/code/staticfiles
@@ -64,6 +71,9 @@ services:
     restart: always
     image: nginx:alpine
     network_mode: host
+    ports:
+      - 80:80
+      - 443:443
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - /etc/letsencrypt:/etc/letsencrypt
