@@ -22,24 +22,24 @@ class ImageUploadView(APIView):
         serializer = MicroscopeImageSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            instance = serializer.instance
-            img = self.read_image(instance.image.path)
-
-            with open(json_path, "r") as json_file:
-                json_modelo_salvo = json_file.read()
-            model = model_from_json(json_modelo_salvo)
-            model.load_weights(model_path)
-
-            prediction = model.predict(img)  # Predição
-            temp = prediction
-            prediction = (prediction > 0.5).astype(np.uint8)
-            if prediction[[0]] == 1:
-                instance.prediction_class = "Positiva"
-                instance.prediction_percentage = round(temp[0][0] * 100, 2)
-            else:
-                instance.prediction_class = "Negativa"
-                instance.prediction_percentage = round((1 - temp[0][0]) * 100, 2)
-            instance.save()
+            # instance = serializer.instance
+            # img = self.read_image(instance.image.path)
+            #
+            # with open(json_path, "r") as json_file:
+            #     json_modelo_salvo = json_file.read()
+            # model = model_from_json(json_modelo_salvo)
+            # model.load_weights(model_path)
+            #
+            # prediction = model.predict(img)  # Predição
+            # temp = prediction
+            # prediction = (prediction > 0.5).astype(np.uint8)
+            # if prediction[[0]] == 1:
+            #     instance.prediction_class = "Positiva"
+            #     instance.prediction_percentage = round(temp[0][0] * 100, 2)
+            # else:
+            #     instance.prediction_class = "Negativa"
+            #     instance.prediction_percentage = round((1 - temp[0][0]) * 100, 2)
+            # instance.save()
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

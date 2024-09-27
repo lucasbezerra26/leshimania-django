@@ -50,7 +50,7 @@ class ListMicroscopeImageView(LoginRequiredMixin, FormView):
         for file in files:
             slide_image = MicroscopeImage(microscope_slide=microscope_slide, image=file)
             slide_image.save()
-            process_image.delay(slide_image.id)
+            # process_image.delay(slide_image.id) # Processamento de imagem vai ser pausado
 
         return redirect(self.get_success_url())
 
@@ -70,7 +70,7 @@ class SlideClassificationView(LoginRequiredMixin, View):
 
 
 class CaptureImageView(LoginRequiredMixin, TemplateView):
-    template_name = "microscope_slide/capture_image.html"
+    template_name = "microscope_slide/capture_image_vue.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

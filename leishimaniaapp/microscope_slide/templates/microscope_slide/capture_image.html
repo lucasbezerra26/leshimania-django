@@ -195,11 +195,8 @@
                 }
                 while (delimiterIndex != -1) {
                   const completeMessage = receivedData.substring(0, delimiterIndex);
-                  {#console.log(completeMessage);#}
                   let data = new TextEncoder().encode('1');
                   document.getElementById('startbutton').click();
-                  {#textArea.value += "Imagem Capturada\n";#}
-                  {#textArea.scrollTop = textArea.scrollHeight;#}
                   await writeSerial(data);
 
                   receivedData = receivedData.substring(delimiterIndex + 1);
