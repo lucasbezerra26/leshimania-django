@@ -8,6 +8,8 @@ from .forms import MicroscopeSlideFormModal, MicroscopeImageForm
 from .models import MicroscopeSlide, MicroscopeImage
 from .tasks import process_image
 
+from django.http import JsonResponse
+
 
 class MicroscopeSlideView(LoginRequiredMixin, View):
 
@@ -78,6 +80,16 @@ class CaptureImageView(LoginRequiredMixin, TemplateView):
         context["slide_name"] = MicroscopeSlide.objects.get(id=slide_id).slide_name
         context["slide_id"] = slide_id
         return context
+
+    def post(self, request, *args, **kwargs):
+        slide_id = self.kwargs["slide_id"]
+        microscope_slide = get_object_or_404(MicroscopeSlide, id=slide_id)
+        files = request.FILES.getlist("file")
+
+        for file in files:
+            slide_image = MicroscopeImage(microscope_slide=microscope_slide, image=file)
+            slide_image.save()
+        return JsonResponse({"status": "ok"})
 
 
 class HomeView(LoginRequiredMixin, View):
