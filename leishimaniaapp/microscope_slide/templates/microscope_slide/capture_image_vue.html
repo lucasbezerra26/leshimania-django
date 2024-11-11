@@ -173,7 +173,7 @@
                               this.receivedData += incomingData;
                               console.log('Dados recebidos:', this.receivedData);
 
-                              if (this.receivedData.includes("Digite 'capturar' para começar a captura")) {
+                              if (this.receivedData.includes("menu")) {
                                   this.showMenu = true;
                                   this.receivedData = '';
                                   this.awaitingCapture = false;
