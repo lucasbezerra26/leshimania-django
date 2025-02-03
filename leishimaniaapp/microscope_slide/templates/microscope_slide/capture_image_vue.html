@@ -267,6 +267,28 @@
                       });
                       return csrfToken;
                   },
+                  async waitForMotionDetection(timeout = 3000) {
+                      return new Promise(async (resolve, reject) => {
+                          const start = Date.now();
+
+                          for (let i = 0; i < 5; i++) {
+                              if (await this.detectMotion()) {
+                                  resolve(true); // Sai do loop e finaliza a Promise
+                                  return;
+                              }
+
+                              console.log(`Tentativa ${i + 1}: Aguardando...`);
+                              await new Promise(res => setTimeout(res, 100)); // Pequeno atraso entre as tentativas
+
+                              if (Date.now() - start > timeout) {
+                                  reject(new Error("Timeout: Nenhum movimento detectado dentro do tempo limite"));
+                                  return;
+                              }
+                          }
+
+                          reject(new Error("Movimento não detectado após 5 tentativas"));
+                      });
+                  },
                   async detectMotion() {
                       const canvas = document.createElement('canvas');
                       const context = canvas.getContext('2d');
@@ -294,10 +316,12 @@
                           if (changes < this.motionThreshold) {
                               console.log("Imagem está estável, capturando...");
                               this.receivedData = '\n Imagem está estável, capturando... \n';
+                              this.lastFrame = data.slice();
                               return true;
                           } else {
                               console.log("Movimento detectado, aguardando...");
                               this.receivedData = '\n Movimento detectado, aguardando... \n';
+                              this.lastFrame = data.slice();
                               return false;
                           }
                       }
@@ -305,13 +329,11 @@
                       this.lastFrame = data.slice(); // Salva o frame atual para a próxima comparação
                   },
 
+
                   async takePicture() {
                       try {
 
-                          for (let i = 0; i < 10; i++) {
-                              if (await this.detectMotion())
-                                  break;
-                          }
+                          await waitForMotionDetection(5000);
 
                           // Cria um elemento canvas temporário para capturar a imagem
                           const canvas = document.createElement('canvas');
