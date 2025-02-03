@@ -333,7 +333,7 @@
                   async takePicture() {
                       try {
 
-                          await waitForMotionDetection(5000);
+                          await this.waitForMotionDetection(5000);
 
                           // Cria um elemento canvas temporário para capturar a imagem
                           const canvas = document.createElement('canvas');
