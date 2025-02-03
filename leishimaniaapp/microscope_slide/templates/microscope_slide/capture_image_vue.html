@@ -133,7 +133,7 @@
                       saveLocal: true,
                       awaitingCapture: false,
                       fileHandle: null,
-                      motionThreshold: 20, // Define o limite de mudança nos pixels
+                      motionThreshold: 400, // Define o limite de mudança nos pixels
                       lastFrame: null, // Armazena o último quadro para comparação
                   };
               },
@@ -315,12 +315,12 @@
 
                           if (changes < this.motionThreshold) {
                               console.log("Imagem está estável, capturando...");
-                              this.receivedData = '\n Imagem está estável, capturando... \n';
+                              this.receivedData += '\n Imagem está estável, capturando... \n';
                               this.lastFrame = data.slice();
                               return true;
                           } else {
                               console.log("Movimento detectado, aguardando...");
-                              this.receivedData = '\n Movimento detectado, aguardando... \n';
+                              this.receivedData += '\n Movimento detectado, aguardando... \n';
                               this.lastFrame = data.slice();
                               return false;
                           }
@@ -333,7 +333,13 @@
                   async takePicture() {
                       try {
 
-                          await this.waitForMotionDetection(5000);
+                          try {
+                              await this.waitForMotionDetection(5000);
+                          } catch (error) {
+                              console.error('Erro ao aguardar a detecção de movimento:', error);
+                          }
+
+
 
                           // Cria um elemento canvas temporário para capturar a imagem
                           const canvas = document.createElement('canvas');
