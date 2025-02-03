@@ -299,13 +299,16 @@
 
                       context.drawImage(this.$refs.video, 0, 0, this.width, this.height);
 
-                      const frame = context.getImageData(0, 0, this.width, this.height);
-                      const data = frame.data;
+                      let frame = context.getImageData(0, 0, this.width, this.height);
+                      let data = frame.data;
 
-                      if (this.lastFrame === null) {
+
+                      setTimeout(() => {
+                          frame = context.getImageData(0, 0, this.width, this.height);
+                          data = frame.data;
                           this.lastFrame = data.slice();
-                          return true;
-                      }
+                      }, 100);
+
 
                       if (this.lastFrame) {
                           let changes = 0;
@@ -332,7 +335,7 @@
                           }
                       }
 
-                      this.lastFrame = data.slice(); // Salva o frame atual para a próxima comparação
+                      return true;
                   },
 
 
