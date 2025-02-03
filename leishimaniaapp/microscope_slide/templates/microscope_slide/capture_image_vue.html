@@ -92,7 +92,13 @@
                 <a href="{% url 'list_microscope_image' slide_id %}" class="btn btn-secondary">Voltar</a>
               </div>
             </div>
-          </div>
+            <div class="text-center mt-3 d-flex align-items-center justify-content-center gap-2">
+              <span class="fw-bold text-secondary">Threshold de Movimento:</span>
+              <input type="number" v-model="motionThreshold"
+                     class="form-control text-center border-2 rounded-pill shadow-sm"
+                     style="width: 120px; height: 40px; font-size: 1.1rem;">
+            </div>
+        </div>
         </div>
       </div>
     </div>
@@ -124,9 +130,11 @@
                       isInicio: true,
                       showMenu: false,
                       showMenuControl: false,
-                      saveLocal: true, // Flag para salvar localmente ou no servidor
-                      awaitingCapture: false, // Estado aguardando confirmação de captura
+                      saveLocal: true,
+                      awaitingCapture: false,
                       fileHandle: null,
+                      motionThreshold: 20, // Define o limite de mudança nos pixels
+                      lastFrame: null, // Armazena o último quadro para comparação
                   };
               },
               mounted() {
@@ -235,6 +243,7 @@
                               if (this.awaitingCapture && incomingData.includes('0')) {
                                   console.log("Confirmação de captura recebida, iniciando captura.");
                                   await this.takePicture();
+                                  {#await this.detectMotion();#}
                               }
                           }
                       } catch (error) {
@@ -258,18 +267,59 @@
                       });
                       return csrfToken;
                   },
+                  async detectMotion() {
+                      const canvas = document.createElement('canvas');
+                      const context = canvas.getContext('2d');
+
+                      // Ajusta a resolução do canvas
+                      canvas.width = this.width;
+                      canvas.height = this.height;
+
+                      context.drawImage(this.$refs.video, 0, 0, this.width, this.height);
+
+                      const frame = context.getImageData(0, 0, this.width, this.height);
+                      const data = frame.data;
+
+                      if (this.lastFrame) {
+                          let changes = 0;
+                          for (let i = 0; i < data.length; i += 4) {
+                              const diff = Math.abs(data[i] - this.lastFrame[i]) +
+                                  Math.abs(data[i + 1] - this.lastFrame[i + 1]) +
+                                  Math.abs(data[i + 2] - this.lastFrame[i + 2]);
+                              if (diff > 10) {
+                                  changes++; // Conta o número de pixels que mudaram
+                              }
+                          }
+
+                          if (changes < this.motionThreshold) {
+                              console.log("Imagem está estável, capturando...");
+                              this.receivedData = '\n Imagem está estável, capturando... \n';
+                              return true;
+                          } else {
+                              console.log("Movimento detectado, aguardando...");
+                              this.receivedData = '\n Movimento detectado, aguardando... \n';
+                              return false;
+                          }
+                      }
+
+                      this.lastFrame = data.slice(); // Salva o frame atual para a próxima comparação
+                  },
 
                   async takePicture() {
                       try {
+
+                          for (let i = 0; i < 10; i++) {
+                              if (await this.detectMotion())
+                                  break;
+                          }
+
                           // Cria um elemento canvas temporário para capturar a imagem
                           const canvas = document.createElement('canvas');
                           const context = canvas.getContext('2d');
 
                           // Ajusta o tamanho do canvas para a resolução máxima da câmera
-                          const videoSettings = this.currentStream.getVideoTracks()[0].getSettings();
                           const maxWidth = 1920;
                           const maxHeight = 1080;
-                          console.log('Resolução da câmera:', videoSettings.width, videoSettings.height);
 
                           canvas.width = maxWidth;
                           canvas.height = maxHeight;
