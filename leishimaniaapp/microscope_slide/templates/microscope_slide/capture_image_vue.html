@@ -133,7 +133,7 @@
                       saveLocal: true,
                       awaitingCapture: false,
                       fileHandle: null,
-                      motionThreshold: 10000, // Define o limite de mudança nos pixels
+                      motionThreshold: 500000, // Define o limite de mudança nos pixels
                       lastFrame: null, // Armazena o último quadro para comparação
                   };
               },
@@ -184,7 +184,7 @@
                           const encoder = new TextEncoder();
                           const encodedData = encoder.encode(data + '\n'); // Adiciona '\n' para indicar o final do comando
                           await writer.write(encodedData);
-                          writer.releaseLock();
+                          await writer.releaseLock();
                       } catch (error) {
                           console.error("Erro ao escrever na porta serial:", error);
                       }
@@ -317,6 +317,7 @@
                                   changes++; // Conta o número de pixels que mudaram
                               }
                           }
+                          console.log(`Mudanças detectadas: ${changes}`);
 
                           if (changes < this.motionThreshold) {
                               console.log("Imagem está estável, capturando...");
@@ -373,7 +374,7 @@
                                       await writableStream.close();
 
                                       console.log(`Imagem ${fileName} salva com sucesso no diretório selecionado`);
-                                      this.writeSerial(1); // Após captura, envia o comando "1" para indicar que a captura foi concluída
+                                      await this.writeSerial(1); // Após captura, envia o comando "1" para indicar que a captura foi concluída
                                   } catch (error) {
                                       console.error('Erro ao salvar a imagem localmente:', error);
                                   }
