@@ -102,8 +102,8 @@
                       reader: null,
                       receivedData: '',
                       isCameraStarted: false,
-                      width: 1280,
-                      height: 720,
+                      width: 1920,
+                      height: 1080,
                       isInicio: true,
                       showMenu: false,
                       saveLocal: true, // Flag para salvar localmente ou no servidor
@@ -172,6 +172,10 @@
                               const incomingData = new TextDecoder().decode(value);
                               this.receivedData += incomingData;
                               console.log('Dados recebidos:', this.receivedData);
+                              this.$nextTick(() => {
+                                  const consoleElement = document.querySelector('.data-console');
+                                  consoleElement.scrollTop = consoleElement.scrollHeight;
+                              });
 
                               if (this.receivedData.includes("menu")) {
                                   this.showMenu = true;
@@ -214,8 +218,8 @@
 
                           // Ajusta o tamanho do canvas para a resolução máxima da câmera
                           const videoSettings = this.currentStream.getVideoTracks()[0].getSettings();
-                          const maxWidth = videoSettings.width || this.width;
-                          const maxHeight = videoSettings.height || this.height;
+                          const maxWidth = 1920;
+                          const maxHeight = 1080;
                           console.log('Resolução da câmera:', videoSettings.width, videoSettings.height);
 
                           canvas.width = maxWidth;
