@@ -22,6 +22,7 @@
               <thead>
                 <tr>
                   <th scope="col">Imagem</th>
+                  <th scope="col">Resultado (imagem)</th>
                   <th scope="col">Classe</th>
                   <th scope="col">Porcentagem</th>
                 </tr>
@@ -31,7 +32,14 @@
                   {% for image in images %}
                     <tr>
                       <td>
-                        <a href="{{ image.image.url }}">{{ image.image }}</a>
+                        <a href="{{ image.image.url }}">{{ image.image_name }}</a>
+                      </td>
+                      <td>
+                         {% if image.image_result %}
+                        <a href="{{ image.image_result.url }}">{{ image.image_result_name }}</a>
+                        {% else %}
+                          -
+                        {% endif %}
                       </td>
                       <td>
                         {% if image.prediction_class %}
@@ -51,7 +59,7 @@
                   {% endfor %}
                 {% else %}
                   <tr>
-                    <td colspan="3">Nenhuma imagem encontrada.</td>
+                    <td colspan="4">Nenhuma imagem encontrada.</td>
                   </tr>
                 {% endif %}
               </tbody>

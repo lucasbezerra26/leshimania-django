@@ -15,7 +15,7 @@ class MicroscopeSlideFormModal(forms.ModelForm):
 
     class Meta:
         model = MicroscopeSlide
-        fields = ["slide_name", "laboratory"]
+        fields = ["slide_name", "laboratory", "task_type"]
         widgets = {
             "slide_name": forms.TextInput(attrs={"class": "form-control"}),
         }

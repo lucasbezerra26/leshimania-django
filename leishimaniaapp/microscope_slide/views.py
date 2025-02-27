@@ -6,7 +6,7 @@ from django.views.generic import TemplateView, FormView
 
 from .forms import MicroscopeSlideFormModal, MicroscopeImageForm
 from .models import MicroscopeSlide, MicroscopeImage
-from .tasks import process_image
+from .tasks import process_image, process_image_yolo
 
 from django.http import JsonResponse
 
@@ -52,7 +52,10 @@ class ListMicroscopeImageView(LoginRequiredMixin, FormView):
         for file in files:
             slide_image = MicroscopeImage(microscope_slide=microscope_slide, image=file)
             slide_image.save()
-            # process_image.delay(slide_image.id) # Processamento de imagem vai ser pausado
+            if microscope_slide.task_type == "yolo":
+                process_image_yolo.delay(slide_image.id)
+            else:
+                process_image.delay(slide_image.id)
 
         return redirect(self.get_success_url())
 

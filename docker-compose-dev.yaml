@@ -1,0 +1,61 @@
+services:
+  postgres:
+    restart: always
+    image: postgres:13-alpine
+    container_name: leishimaniaapp-db
+    env_file:
+      - .env
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data/pgdata
+    ports:
+      - 5440:5432
+
+  rabbitmq:
+    image: rabbitmq:latest
+    network_mode: host
+    env_file:
+      - .env
+    ports:
+      - 5673:5672
+      - 15673:15672
+
+
+  worker:
+    platform: linux/x86_64
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: celery -A leishimaniaapp worker -l info --concurrency=2
+    network_mode: host
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+      - postgres
+    volumes:
+      - ./staticfiles:/code/staticfiles
+      - ./media:/code/media
+
+#  web:
+#    restart: always
+#    build:
+#      context: .
+#      dockerfile: ./Dockerfile
+#    env_file:
+#      - .env
+#    depends_on:
+#      - postgres
+#    ports:
+#      - 8080:8080
+#    entrypoint: /code/scripts_infra/entrypoint.sh
+#    volumes:
+#      - ./staticfiles:/code/staticfiles
+#      - ./media:/code/media
+
+volumes:
+  data:
+  staticfiles:
+  media:

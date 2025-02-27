@@ -12,41 +12,41 @@ services:
     ports:
       - 5432:5432
 
-#  rabbit:
-#    restart: always
-#    image: rabbitmq:latest
-#    network_mode: host
-#    env_file:
-#      - .env
-#    volumes:
-#      - ./data/rabbitmq/data/:/var/lib/rabbitmq/
-#      - ./data/rabbitmq/log/:/var/log/rabbitmq
-#    ports:
-#      - 5672:5672
-#      - 15672:15672
-#    healthcheck:
-#      test: ["CMD", "rabbitmqctl", "status"]
-#      interval: 30s
-#      timeout: 30s
-#      retries: 3
+  rabbit:
+    restart: always
+    image: rabbitmq:latest
+    network_mode: host
+    env_file:
+      - .env
+    volumes:
+      - ./data/rabbitmq/data/:/var/lib/rabbitmq/
+      - ./data/rabbitmq/log/:/var/log/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
 
-#  worker:
-#    restart: always
-#    platform: linux/x86_64
-#    build:
-#      context: .
-#      dockerfile: ./Dockerfile
-#    command: celery -A leishimaniaapp worker -l info --concurrency=2
-#    network_mode: host
-#    env_file:
-#      - .env
-#    depends_on:
-#      - rabbit
-#      - postgres
-#    volumes:
-#      - ./staticfiles:/code/staticfiles
-#      - ./media:/code/media
-#    mem_limit: 1000m
+  worker:
+    restart: always
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: celery -A leishimaniaapp worker -l info --concurrency=2
+    network_mode: host
+    env_file:
+      - .env
+    depends_on:
+      - rabbit
+      - postgres
+    volumes:
+      - ./staticfiles:/code/staticfiles
+      - ./media:/code/media
+    mem_limit: 1000m
 
   web:
     platform: linux/x86_64
