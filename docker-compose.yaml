@@ -2,6 +2,7 @@ services:
   postgres:
     restart: always
     image: postgres:13-alpine
+    network_mode: host
     container_name: leishimaniaapp-db
     env_file:
       - .env
@@ -59,7 +60,7 @@ services:
       - .env
     depends_on:
       - postgres
-#      - rabbit
+      - rabbit
     ports:
       - 8080:8080
     entrypoint: /code/scripts_infra/entrypoint.sh
