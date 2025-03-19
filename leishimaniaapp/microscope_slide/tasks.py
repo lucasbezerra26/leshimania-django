@@ -52,6 +52,9 @@ class ImagePatcher:
         self.path_image = path_image
         # Lê a imagem (em RGB) via skimage
         self.image = imread(self.path_image)
+
+        if self.image.shape[2] == 4:
+            self.image = cv2.cvtColor(self.image, cv2.COLOR_BGRA2BGR)
         self.patches = []
 
     def get_patches(self, patch_h=270, patch_w=480):

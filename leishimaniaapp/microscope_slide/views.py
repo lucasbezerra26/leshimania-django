@@ -5,7 +5,7 @@ from django.views import View
 from django.views.generic import TemplateView, FormView
 
 from .forms import MicroscopeSlideFormModal, MicroscopeImageForm
-from .models import MicroscopeSlide, MicroscopeImage
+from .models import MicroscopeSlide, MicroscopeImage, TaskType
 from .tasks import process_image, process_image_yolo
 
 from django.http import JsonResponse
@@ -92,6 +92,12 @@ class CaptureImageView(LoginRequiredMixin, TemplateView):
         for file in files:
             slide_image = MicroscopeImage(microscope_slide=microscope_slide, image=file)
             slide_image.save()
+            slide_image.refresh_from_db()
+
+            if microscope_slide.task_type == TaskType.YOLO:
+                process_image_yolo.delay(slide_image.id)
+            else:
+                process_image.delay(slide_image.id)
         return JsonResponse({"status": "ok"})
 
 
