@@ -64,6 +64,9 @@ services:
     restart: always
     image: nginx
     network_mode: host
+    build:
+      context: .
+      dockerfile: ./DockerfileNginx
     ports:
       - 80:80
       - 443:443
