@@ -34,11 +34,16 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = ["*"]
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "leishvision.tech",
+    "www.leishvision.tech",
+    "localhost",
+    "127.0.0.1",
+    "172.174.33.189",
+]
 CSRF_TRUSTED_ORIGINS = [
-    "https://leishiapp.software",
-    "https://www.leishiapp.software",
-    "http://http://172.174.33.189/",
+    "https://leishvision.tech",
+    "https://www.leishvision.tech",
 ]
 
 
