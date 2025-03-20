@@ -34,15 +34,11 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = ["*"]
 
-ALLOWED_HOSTS = [
-    "leishiapp.software",
-    "www.leishiapp.software",
-    "localhost",
-    "127.0.0.1",
-]
+ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
     "https://leishiapp.software",
     "https://www.leishiapp.software",
+    "http://http://172.174.33.189/",
 ]
 
 
