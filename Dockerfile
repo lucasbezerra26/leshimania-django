@@ -14,6 +14,8 @@ WORKDIR /code
 
 # Install Python dependencies
 COPY requirements.txt /code/
+RUN python3 -m .venv /code/.venv
+RUN source /code/.venv/bin/activate
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 

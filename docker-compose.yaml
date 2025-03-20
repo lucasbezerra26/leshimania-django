@@ -41,8 +41,7 @@ services:
       - rabbit
       - postgres
     volumes:
-      - ./staticfiles:/code/staticfiles
-      - ./media:/code/media
+      - ./:/code
     mem_limit: 1000m
 
   web:
@@ -59,8 +58,7 @@ services:
       - rabbit
     entrypoint: /code/scripts_infra/entrypoint.sh
     volumes:
-      - ./staticfiles:/code/staticfiles
-      - ./media:/code/media
+      - ./:/code
 
 #  nginx:
 #    restart: always
