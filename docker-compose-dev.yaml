@@ -22,13 +22,11 @@ services:
 
 
   worker:
-    platform: linux/x86_64
     restart: always
     build:
       context: .
       dockerfile: ./Dockerfile
     command: celery -A leishimaniaapp worker -l info --concurrency=2
-    network_mode: host
     env_file:
       - .env
     depends_on:
@@ -38,21 +36,21 @@ services:
       - ./staticfiles:/code/staticfiles
       - ./media:/code/media
 
-#  web:
-#    restart: always
-#    build:
-#      context: .
-#      dockerfile: ./Dockerfile
-#    env_file:
-#      - .env
-#    depends_on:
-#      - postgres
-#    ports:
-#      - 8080:8080
-#    entrypoint: /code/scripts_infra/entrypoint.sh
-#    volumes:
-#      - ./staticfiles:/code/staticfiles
-#      - ./media:/code/media
+  web:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    ports:
+      - 8080:80
+    entrypoint: python manage.py runserver 80
+    volumes:
+      - ./staticfiles:/code/staticfiles
+      - ./media:/code/media
 
 volumes:
   data:
