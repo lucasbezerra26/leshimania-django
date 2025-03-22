@@ -23,7 +23,7 @@
       <div class="col-lg-12">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title text-center">Classificação de Imagens de LV Humana</h5>
+            <h5 class="card-title text-center">Detecção de Leishmaniose Visceral (Calazar) </h5>
 
             <div class="row justify-content-center">
               <div class="col-lg-6">
@@ -59,6 +59,8 @@
                   <button class="btn btn-primary pre-capture m-2" @click="writeSerial('configurar')">Configurar</button>
                   <button class="btn btn-success pre-capture m-2" @click="startCapture">Capturar</button>
                   <button class="btn btn-warning pre-capture m-2" @click="writeSerial('testar')">Testar</button>
+                  <button class="btn btn-dark pre-capture m-2" @click="writeSerial('ajustar')">Ajustar</button>
+
                 </div>
                 <div class="mt-3" v-if="showMenuControl">
                     <h5>Controle de Passos:</h5>
@@ -124,7 +126,7 @@
                       isInicio: true,
                       showMenu: false,
                       showMenuControl: false,
-                      saveLocal: true, // Flag para salvar localmente ou no servidor
+                      saveLocal: false, // Flag para salvar localmente ou no servidor
                       awaitingCapture: false, // Estado aguardando confirmação de captura
                       fileHandle: null,
                   };
@@ -261,6 +263,10 @@
 
                   async takePicture() {
                       try {
+
+                          setTimeout(() => {
+                              console.log('Aguardando 2 segundos para capturar a imagem...');
+                          }, 2000);
                           // Cria um elemento canvas temporário para capturar a imagem
                           const canvas = document.createElement('canvas');
                           const context = canvas.getContext('2d');

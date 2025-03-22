@@ -106,7 +106,7 @@ class MicroscopeImage(BaseModelUuid):
     class Meta:
         verbose_name = "Imagem de microscópio"
         verbose_name_plural = "Imagens de microscópio"
-        ordering = ["microscope_slide__slide_name"]
+        ordering = ["-created_at"]
 
     def image_name(self):
         return self.image.name.split("/")[-1]

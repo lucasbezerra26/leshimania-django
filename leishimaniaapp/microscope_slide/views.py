@@ -53,7 +53,7 @@ class ListMicroscopeImageView(LoginRequiredMixin, FormView):
             slide_image = MicroscopeImage(microscope_slide=microscope_slide, image=file)
             slide_image.save()
             if microscope_slide.task_type == "yolo":
-                process_image_yolo.delay(slide_image.id)
+                process_image_yolo.delay(str(slide_image.id))
             else:
                 process_image.delay(slide_image.id)
 
